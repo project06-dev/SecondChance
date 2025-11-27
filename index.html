@@ -419,8 +419,9 @@
             <!-- Form Login -->
             <form id="login-form" class="form active">
                 <div class="form-group">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" placeholder="Masukkan email" required>
+                    <label for="login-identifier">Username atau Email</label>
+                    <input type="text" id="login-identifier" placeholder="Masukkan username atau email" required>
+                    <div class="error" id="login-error"></div>
                 </div>
                 <div class="form-group">
                     <label for="login-password">Password</label>
@@ -444,6 +445,12 @@
                 <div class="form-group">
                     <label for="register-name">Nama Lengkap</label>
                     <input type="text" id="register-name" placeholder="Masukkan nama lengkap" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-username">Username</label>
+                    <input type="text" id="register-username" placeholder="Masukkan username" required minlength="3" pattern="[a-zA-Z0-9_]+" title="Username hanya boleh huruf, angka, dan underscore">
+                    <div class="requirements">Minimal 3 karakter, hanya huruf, angka, dan underscore</div>
+                    <div class="error" id="username-error"></div>
                 </div>
                 <div class="form-group">
                     <label for="register-dob">Tanggal Lahir</label>
@@ -591,21 +598,58 @@
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('register-email').value;
+            const name = document.getElementById('register-name').value.trim();
+            const username = document.getElementById('register-username').value.trim();
+            const dob = document.getElementById('register-dob').value;
+            const email = document.getElementById('register-email').value.trim();
+            const phone = document.getElementById('register-phone').value.trim();
             const password = document.getElementById('register-password').value;
             const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            const usernameError = document.getElementById('username-error');
             const emailError = document.getElementById('email-error');
             const passwordError = document.getElementById('password-error');
             
             // Clear previous errors
+            usernameError.textContent = '';
             emailError.textContent = '';
             passwordError.textContent = '';
+            
+            // Validate username
+            if (username.length < 3) {
+                usernameError.textContent = 'Username minimal 3 karakter';
+                return;
+            }
+            
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                usernameError.textContent = 'Username hanya boleh huruf, angka, dan underscore';
+                return;
+            }
+            
+            // Check if username already exists
+            const existingUsers = Object.keys(localStorage).filter(key => key.startsWith('user_'));
+            for (let key of existingUsers) {
+                const userData = JSON.parse(localStorage.getItem(key));
+                if (userData.username && userData.username.toLowerCase() === username.toLowerCase()) {
+                    usernameError.textContent = 'Username sudah digunakan';
+                    return;
+                }
+            }
             
             // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 emailError.textContent = 'Format email tidak valid';
                 return;
+            }
+            
+            // Check if email already exists
+            for (let key of existingUsers) {
+                const userData = JSON.parse(localStorage.getItem(key));
+                if (userData.email && userData.email.toLowerCase() === email.toLowerCase()) {
+                    emailError.textContent = 'Email sudah terdaftar';
+                    return;
+                }
             }
             
             // Validate password
@@ -624,6 +668,18 @@
                 return;
             }
             
+            // Save user data
+            const userData = {
+                name: name,
+                username: username,
+                email: email,
+                phone: phone,
+                dob: dob,
+                password: password
+            };
+            
+            localStorage.setItem(`user_${username}`, JSON.stringify(userData));
+            
             // Success
             successMessage.textContent = 'Registrasi berhasil! Silakan login.';
             setTimeout(() => {
@@ -634,9 +690,48 @@
         // Login form submission
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            const identifier = document.getElementById('login-identifier').value.trim();
+            const password = document.getElementById('login-password').value;
+            const loginError = document.getElementById('login-error');
+            
+            loginError.textContent = '';
+            
+            // Cari user berdasarkan username atau email
+            const existingUsers = Object.keys(localStorage).filter(key => key.startsWith('user_'));
+            let foundUser = null;
+            let userKey = null;
+            
+            for (let key of existingUsers) {
+                const userData = JSON.parse(localStorage.getItem(key));
+                if (userData.username && userData.username.toLowerCase() === identifier.toLowerCase()) {
+                    foundUser = userData;
+                    userKey = key;
+                    break;
+                }
+                if (userData.email && userData.email.toLowerCase() === identifier.toLowerCase()) {
+                    foundUser = userData;
+                    userKey = key;
+                    break;
+                }
+            }
+            
+            if (!foundUser) {
+                loginError.textContent = 'Username atau email tidak ditemukan';
+                return;
+            }
+            
+            if (foundUser.password !== password) {
+                loginError.textContent = 'Password salah';
+                return;
+            }
+            
+            // Set current user
+            localStorage.setItem('currentUser', userKey);
+            
             successMessage.textContent = 'Login berhasil!';
             setTimeout(() => {
-                window.location.href = 'dashboard.html'; // Ganti dengan halaman tujuan
+                window.location.href = 'dashboard.html';
             }, 1500);
         });
         
