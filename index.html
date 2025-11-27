@@ -441,7 +441,6 @@
             
             <!-- Form Register -->
             <form id="register-form" class="form">
-                <h2>Buat Akun Baru</h2>
                 <div class="form-group">
                     <label for="register-name">Nama Lengkap</label>
                     <input type="text" id="register-name" placeholder="Masukkan nama lengkap" required>
@@ -568,6 +567,14 @@
             clearForm(hide1);
             clearForm(hide2);
             successMessage.textContent = '';
+            
+            // Show/hide header based on active form
+            const header = document.querySelector('.header');
+            if (show === loginForm) {
+                header.style.display = 'block';
+            } else {
+                header.style.display = 'none';
+            }
         }
         
         // Clear form function
