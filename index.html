@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login </title>
+    <style>
+        /* Variabel Warna Tema Elegant */
+        :root {
+            --primary-light: #f8f0ff;
+            --primary: #e6ccff;
+            --primary-dark: #b19cd9;
+            --accent: #d4a574;
+            --white: #ffffff;
+            --gray-light: #f8f9fa;
+            --gray: #6c757d;
+            --text: #2c3e50;
+            --shadow: rgba(179, 156, 217, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Decorative background elements */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            right: 10%;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .container {
+            background-color: var(--white);
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(232, 62, 140, 0.15);
+            width: 100%;
+            max-width: 480px;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--pink-dark), var(--purple), var(--pink));
+        }
+
+        .header {
+            background: transparent;
+            color: var(--text);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto 15px;
+            display: block;
+            mix-blend-mode: multiply;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 800;
+            color: var(--pink-dark);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.8;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .form-container {
+            padding: 40px 35px 35px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 22px;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid var(--primary-light);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: rgba(248, 240, 255, 0.3);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 2px rgba(177, 156, 217, 0.2);
+            background: var(--white);
+            transform: translateY(-1px);
+        }
+
+        input::placeholder {
+            color: var(--gray);
+            opacity: 0.7;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--accent));
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(177, 156, 217, 0.3);
+        }
+
+        .form {
+            display: none;
+        }
+
+        .form.active {
+            display: block;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--gray);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .message a::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--primary-dark);
+            transition: width 0.3s;
+        }
+
+        .message a:hover::after {
+            width: 100%;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .success {
+            color: #27ae60;
+            font-size: 15px;
+            margin-top: 20px;
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.1), rgba(39, 174, 96, 0.05));
+            border-radius: 10px;
+            border-left: 4px solid #27ae60;
+            font-weight: 600;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--primary-dark);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .toggle-password:hover {
+            color: var(--accent);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .requirements {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 95%;
+                margin: 10px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .logo {
+                max-width: 220px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .form-container {
+                padding: 30px 25px 25px;
+            }
+
+            body::before, body::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="images/logo.png" alt="Second Chance Logo" class="logo">
+            <p>Login</p>
+        </div>
+        
+        <div class="form-container">
+            <!-- Form Login -->
+            <form id="login-form" class="form active">
+                <h2>Login</h2>
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="Masukkan email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="login-password" placeholder="Masukkan password" required>
+                        <span class="toggle-password" onclick="togglePassword('login-password')">👁️</span>
+                    </div>
+                </div>
+                <button type="submit">Masuk</button>
+                <div class="message">
+                    <a id="to-change-password">Lupa password? Klik di sini untuk mengubah</a>
+                </div>
+                <div class="message">
+                    Belum punya akun? <a id="to-register">Daftar</a>
+                </div>
+            </form>
+            
+            <!-- Form Register -->
+            <form id="register-form" class="form">
+                <h2>Buat Akun Baru</h2>
+                <div class="form-group">
+                    <label for="register-name">Nama Lengkap</label>
+                    <input type="text" id="register-name" placeholder="Masukkan nama lengkap" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-dob">Tanggal Lahir</label>
+                    <input type="date" id="register-dob" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" placeholder="Masukkan email" required>
+                    <div class="error" id="email-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="register-phone">Nomor HP</label>
+                    <input type="tel" id="register-phone" placeholder="Masukkan nomor handphone" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="register-password" placeholder="Buat password" required>
+                        <span class="toggle-password" onclick="togglePassword('register-password')">👁️</span>
+                    </div>
+                    <div class="requirements">Minimal 6 karakter, kombinasi huruf dan angka</div>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password">Konfirmasi Password</label>
+                    <div class="password-container">
+                        <input type="password" id="register-confirm-password" placeholder="Ulangi password" required>
+                        <span class="toggle-password" onclick="togglePassword('register-confirm-password')">👁️</span>
+                    </div>
+                    <div class="error" id="password-error"></div>
+                </div>
+                <button type="submit">Daftar</button>
+                <div class="message">
+                    Sudah punya akun? <a id="to-login">Login di sini</a>
+                </div>
+            </form>
+            
+            <!-- Form Ubah Password -->
+            <form id="change-password-form" class="form">
+                <h2>Ubah Password</h2>
+                <div class="form-group">
+                    <label for="change-email">Email</label>
+                    <input type="email" id="change-email" placeholder="Masukkan email" required>
+                </div>
+                <div class="form-group">
+                    <label for="old-password">Password Lama</label>
+                    <div class="password-container">
+                        <input type="password" id="old-password" placeholder="Masukkan password lama" required>
+                        <span class="toggle-password" onclick="togglePassword('old-password')">👁️</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="new-password">Password Baru</label>
+                    <div class="password-container">
+                        <input type="password" id="new-password" placeholder="Masukkan password baru" required>
+                        <span class="toggle-password" onclick="togglePassword('new-password')">👁️</span>
+                    </div>
+                    <div class="requirements">Minimal 6 karakter, kombinasi huruf dan angka</div>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-new-password">Konfirmasi Password Baru</label>
+                    <div class="password-container">
+                        <input type="password" id="confirm-new-password" placeholder="Ulangi password baru" required>
+                        <span class="toggle-password" onclick="togglePassword('confirm-new-password')">👁️</span>
+                    </div>
+                    <div class="error" id="change-password-error"></div>
+                </div>
+                <button type="submit">Ubah Password</button>
+                <div class="message">
+                    <a id="back-to-login">Kembali ke login</a>
+                </div>
+            </form>
+            
+            <div id="success-message" class="success"></div>
+        </div>
+    </div>
+
+    <script>
+        // Element references
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const changePasswordForm = document.getElementById('change-password-form');
+        const toLogin = document.getElementById('to-login');
+        const toRegister = document.getElementById('to-register');
+        const toChangePassword = document.getElementById('to-change-password');
+        const backToLogin = document.getElementById('back-to-login');
+        const successMessage = document.getElementById('success-message');
+
+        // Switch to Login form
+        toLogin.addEventListener('click', () => {
+            switchForm(loginForm, registerForm, changePasswordForm);
+        });
+
+        // Switch to Register form
+        toRegister.addEventListener('click', () => {
+            switchForm(registerForm, loginForm, changePasswordForm);
+        });
+
+        // Switch to Change Password form
+        toChangePassword.addEventListener('click', () => {
+            switchForm(changePasswordForm, loginForm, registerForm);
+        });
+
+        // Back to Login from Change Password
+        backToLogin.addEventListener('click', () => {
+            switchForm(loginForm, changePasswordForm, registerForm);
+        });
+
+        // Form switching function
+        function switchForm(show, hide1, hide2) {
+            show.classList.add('active');
+            hide1.classList.remove('active');
+            hide2.classList.remove('active');
+
+            // Clear forms and messages when switching
+            clearForm(hide1);
+            clearForm(hide2);
+            successMessage.textContent = '';
+        }
+        
+        // Clear form function
+        function clearForm(form) {
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+            
+            const errorMessages = form.querySelectorAll('.error');
+            errorMessages.forEach(error => {
+                error.textContent = '';
+            });
+        }
+        
+        // Toggle password visibility
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
+        }
+        
+        // Form validation and submission
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            const emailError = document.getElementById('email-error');
+            const passwordError = document.getElementById('password-error');
+            
+            // Reset error messages
+            emailError.textContent = '';
+            passwordError.textContent = '';
+            
+            // Validate email format
+            if (!validateEmail(email)) {
+                emailError.textContent = 'Format email tidak valid';
+                return;
+            }
+            
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                passwordError.textContent = 'Password tidak cocok';
+                return;
+            }
+            
+            // Check password length
+            if (password.length < 6) {
+                passwordError.textContent = 'Password minimal 6 karakter';
+                return;
+            }
+            
+            // Save user data to localStorage (simulated database)
+            const userData = {
+                name: document.getElementById('register-name').value,
+                dob: document.getElementById('register-dob').value,
+                email: email,
+                phone: document.getElementById('register-phone').value,
+                password: password
+            };
+            
+            localStorage.setItem(email, JSON.stringify(userData));
+            
+            // Show success message
+            successMessage.textContent = 'Pendaftaran berhasil! Silakan login.';
+            
+            // Clear form
+            clearForm(registerForm);
+            
+            // Switch to login form after a delay
+            setTimeout(() => {
+                switchForm(loginForm, registerForm, changePasswordForm, loginTab, registerTab);
+            }, 2000);
+        });
+        
+        // Login form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Get user data from localStorage
+            const userData = JSON.parse(localStorage.getItem(email));
+            
+            if (!userData) {
+                successMessage.textContent = 'Email tidak terdaftar';
+                return;
+            }
+            
+            if (userData.password !== password) {
+                successMessage.textContent = 'Password salah';
+                return;
+            }
+            
+            // Login successful
+            successMessage.textContent = `Login berhasil! Selamat datang ${userData.name}`;
+            
+            // Store current user
+            localStorage.setItem('currentUser', email);
+            
+            // Clear form
+            clearForm(loginForm);
+            
+            // Redirect to dashboard page
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 2000);
+        });
+        
+        // Change password form submission
+        changePasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('change-email').value;
+            const oldPassword = document.getElementById('old-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmNewPassword = document.getElementById('confirm-new-password').value;
+            const changePasswordError = document.getElementById('change-password-error');
+            
+            // Reset error message
+            changePasswordError.textContent = '';
+            
+            // Get user data from localStorage
+            const userData = JSON.parse(localStorage.getItem(email));
+            
+            if (!userData) {
+                changePasswordError.textContent = 'Email tidak terdaftar';
+                return;
+            }
+            
+            if (userData.password !== oldPassword) {
+                changePasswordError.textContent = 'Password lama salah';
+                return;
+            }
+            
+            if (newPassword !== confirmNewPassword) {
+                changePasswordError.textContent = 'Password baru tidak cocok';
+                return;
+            }
+            
+            // Check password length
+            if (newPassword.length < 6) {
+                changePasswordError.textContent = 'Password baru minimal 6 karakter';
+                return;
+            }
+            
+            // Update password
+            userData.password = newPassword;
+            localStorage.setItem(email, JSON.stringify(userData));
+            
+            // Show success message
+            successMessage.textContent = 'Password berhasil diubah! Silakan login dengan password baru.';
+            
+            // Clear form
+            clearForm(changePasswordForm);
+            
+            // Switch to login form after a delay
+            setTimeout(() => {
+                switchForm(loginForm, changePasswordForm, registerForm);
+            }, 2000);
+        });
+        
+        // Email validation function
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+    </script>
+</body>
+</html>
