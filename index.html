@@ -353,8 +353,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="images/logo.png" alt="Second Chance Logo" class="logo">
-            <p>Login</p>
+            <img src="https://freeimage.host/i/fBmhFbS" alt="Second Chance Logo" class="logo">
         </div>
         
         <div class="form-container">
@@ -529,6 +528,7 @@
             }
         }
         
+                
         // Form validation and submission
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -539,144 +539,79 @@
             const emailError = document.getElementById('email-error');
             const passwordError = document.getElementById('password-error');
             
-            // Reset error messages
+            // Clear previous errors
             emailError.textContent = '';
             passwordError.textContent = '';
             
             // Validate email format
-            if (!validateEmail(email)) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
                 emailError.textContent = 'Format email tidak valid';
                 return;
             }
             
-            // Check if passwords match
-            if (password !== confirmPassword) {
-                passwordError.textContent = 'Password tidak cocok';
-                return;
-            }
-            
-            // Check password length
+            // Validate password
             if (password.length < 6) {
                 passwordError.textContent = 'Password minimal 6 karakter';
                 return;
             }
             
-            // Save user data to localStorage (simulated database)
-            const userData = {
-                name: document.getElementById('register-name').value,
-                dob: document.getElementById('register-dob').value,
-                email: email,
-                phone: document.getElementById('register-phone').value,
-                password: password
-            };
+            if (!/\d/.test(password) || !/[a-zA-Z]/.test(password)) {
+                passwordError.textContent = 'Password harus kombinasi huruf dan angka';
+                return;
+            }
             
-            localStorage.setItem(email, JSON.stringify(userData));
+            if (password !== confirmPassword) {
+                passwordError.textContent = 'Password tidak cocok';
+                return;
+            }
             
-            // Show success message
-            successMessage.textContent = 'Pendaftaran berhasil! Silakan login.';
-            
-            // Clear form
-            clearForm(registerForm);
-            
-            // Switch to login form after a delay
+            // Success
+            successMessage.textContent = 'Registrasi berhasil! Silakan login.';
             setTimeout(() => {
-                switchForm(loginForm, registerForm, changePasswordForm, loginTab, registerTab);
+                switchForm(loginForm, registerForm, changePasswordForm);
             }, 2000);
         });
         
         // Login form submission
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
-            // Get user data from localStorage
-            const userData = JSON.parse(localStorage.getItem(email));
-            
-            if (!userData) {
-                successMessage.textContent = 'Email tidak terdaftar';
-                return;
-            }
-            
-            if (userData.password !== password) {
-                successMessage.textContent = 'Password salah';
-                return;
-            }
-            
-            // Login successful
-            successMessage.textContent = `Login berhasil! Selamat datang ${userData.name}`;
-            
-            // Store current user
-            localStorage.setItem('currentUser', email);
-            
-            // Clear form
-            clearForm(loginForm);
-            
-            // Redirect to dashboard page
+            successMessage.textContent = 'Login berhasil!';
             setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 2000);
+                window.location.href = 'dashboard.html'; // Ganti dengan halaman tujuan
+            }, 1500);
         });
         
         // Change password form submission
         changePasswordForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('change-email').value;
-            const oldPassword = document.getElementById('old-password').value;
             const newPassword = document.getElementById('new-password').value;
             const confirmNewPassword = document.getElementById('confirm-new-password').value;
             const changePasswordError = document.getElementById('change-password-error');
             
-            // Reset error message
             changePasswordError.textContent = '';
             
-            // Get user data from localStorage
-            const userData = JSON.parse(localStorage.getItem(email));
-            
-            if (!userData) {
-                changePasswordError.textContent = 'Email tidak terdaftar';
+            if (newPassword.length < 6) {
+                changePasswordError.textContent = 'Password minimal 6 karakter';
                 return;
             }
             
-            if (userData.password !== oldPassword) {
-                changePasswordError.textContent = 'Password lama salah';
+            if (!/\d/.test(newPassword) || !/[a-zA-Z]/.test(newPassword)) {
+                changePasswordError.textContent = 'Password harus kombinasi huruf dan angka';
                 return;
             }
             
             if (newPassword !== confirmNewPassword) {
-                changePasswordError.textContent = 'Password baru tidak cocok';
+                changePasswordError.textContent = 'Password tidak cocok';
                 return;
             }
             
-            // Check password length
-            if (newPassword.length < 6) {
-                changePasswordError.textContent = 'Password baru minimal 6 karakter';
-                return;
-            }
-            
-            // Update password
-            userData.password = newPassword;
-            localStorage.setItem(email, JSON.stringify(userData));
-            
-            // Show success message
-            successMessage.textContent = 'Password berhasil diubah! Silakan login dengan password baru.';
-            
-            // Clear form
-            clearForm(changePasswordForm);
-            
-            // Switch to login form after a delay
+            successMessage.textContent = 'Password berhasil diubah!';
             setTimeout(() => {
                 switchForm(loginForm, changePasswordForm, registerForm);
             }, 2000);
         });
-        
-        // Email validation function
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
     </script>
 </body>
 </html>
