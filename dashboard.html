@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -102,22 +102,22 @@
             padding: 15px 0;
         }
         
-        .logo {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-        
-        .logo h1 {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--pink-dark);
-            margin-left: 10px;
-        }
-        
-        .logo span {
-            color: var(--purple);
-        }
+.logo {
+    display: flex;
+    align-items: center;
+    cursor: default; /* Ubah dari pointer jika tidak ingin clickable */
+}
+
+.logo-img {
+    max-width: 50px; /* Ukuran logo diperkecil lebih kecil lagi */
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease; /* Efek hover opsional */
+}
+
+.logo-img:hover {
+    transform: scale(1.05); /* Efek hover opsional, hapus jika tidak diinginkan */
+}
         
         .search-bar {
             flex: 1;
@@ -2478,6 +2478,151 @@
             background: var(--pink-light);
             border-color: var(--pink-dark);
         }
+
+        /* ========== ADDRESS MANAGEMENT STYLES ========== */
+        .address-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .address-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .address-card.default {
+            border-color: var(--pink-dark);
+            background: linear-gradient(to right, rgba(255, 214, 231, 0.1), white);
+        }
+
+        .address-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .address-label {
+            display: inline-block;
+            background: var(--pink-dark);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .default-badge {
+            background: linear-gradient(135deg, var(--pink-dark), var(--purple));
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .address-info {
+            margin-bottom: 15px;
+        }
+
+        .address-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .address-info p {
+            font-size: 14px;
+            color: var(--gray);
+            margin: 3px 0;
+            line-height: 1.6;
+        }
+
+        .address-info .phone {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .address-info .phone i {
+            color: var(--pink-dark);
+        }
+
+        .address-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .btn-set-default {
+            flex: 1;
+            padding: 10px;
+            background: var(--gray-light);
+            color: var(--pink-dark);
+            border: 2px solid var(--pink-light);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-set-default:hover {
+            background: var(--pink-light);
+            border-color: var(--pink-dark);
+        }
+
+        .btn-set-default.active {
+            background: var(--pink-dark);
+            color: white;
+            border-color: var(--pink-dark);
+            cursor: default;
+        }
+
+        .btn-edit-address {
+            padding: 10px 15px;
+            background: var(--pink-dark);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-edit-address:hover {
+            background: var(--pink);
+        }
+
+        .btn-delete-address {
+            padding: 10px 15px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-delete-address:hover {
+            background: #ff5252;
+        }
         
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -2550,10 +2695,9 @@
     <header>
         <div class="container">
             <div class="header-top">
-                <div class="logo" onclick="showPage('home')">
-                    <i class="fas fa-heart-circle-check" style="font-size: 32px; color: var(--pink-dark);"></i>
-                    <h1>Second <span>Chance</span></h1>
-                </div>
+                <div class="logo">
+        <img src="https://i.imgur.com/Mfk3suT.png" alt="Second Chance Logo" class="logo-img">
+    </div>
                 
                 <div class="search-bar">
                     <input type="text" id="searchInput" placeholder="Cari produk, kategori, atau merek...">
@@ -2661,12 +2805,18 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="productSeller">Nama Penjual *</label>
-                            <input type="text" id="productSeller" required placeholder="Nama Anda">
+                            <input type="text" id="productSeller" required placeholder="Nama Anda" readonly style="background-color: var(--gray-light); cursor: not-allowed;">
+                            <small style="color: var(--gray); font-size: 12px; margin-top: 5px; display: block;">
+                                <i class="fas fa-info-circle"></i> Diambil dari alamat utama Anda
+                            </small>
                         </div>
                         
                         <div class="form-group">
                             <label for="productLocation">Lokasi *</label>
-                            <input type="text" id="productLocation" required placeholder="Jakarta Selatan">
+                            <input type="text" id="productLocation" required placeholder="Jakarta Selatan" readonly style="background-color: var(--gray-light); cursor: not-allowed;">
+                            <small style="color: var(--gray); font-size: 12px; margin-top: 5px; display: block;">
+                                <i class="fas fa-info-circle"></i> Diambil dari alamat utama Anda
+                            </small>
                         </div>
                     </div>
                     
@@ -2744,6 +2894,15 @@
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
 
+                <div class="profile-menu-item" onclick="showPage('myAddresses')">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div class="menu-text">
+                        <h4>Alamat Saya</h4>
+                        <p>Kelola alamat pengiriman</p>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+
                 <div class="profile-menu-item" onclick="showPage('myProducts')">
                     <i class="fas fa-box"></i>
                     <div class="menu-text">
@@ -2758,6 +2917,15 @@
                     <div class="menu-text">
                         <h4>Tracking Pesanan</h4>
                         <p>Lacak barang yang dibeli</p>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+
+                <div class="profile-menu-item" onclick="showPage('orderHistory')">
+                    <i class="fas fa-history"></i>
+                    <div class="menu-text">
+                        <h4>Riwayat Pesanan</h4>
+                        <p>Lihat pesanan yang sudah selesai</p>
                     </div>
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
@@ -2851,6 +3019,48 @@
 
             <div id="orderTrackingContainer">
                 <!-- Order tracking will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- ORDER HISTORY PAGE -->
+    <div id="orderHistoryPage" class="page-section">
+        <section class="container my-products-page">
+            <!-- Header dengan tombol back -->
+            <div style="display: flex; align-items: center; padding: 20px 0 10px; gap: 15px;">
+                <button onclick="showPage('profile')" style="background: transparent; border: none; color: var(--pink-dark); font-size: 24px; cursor: pointer; padding: 5px; width: auto;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 style="margin: 0; font-size: 24px; color: var(--text); font-weight: 700;">Riwayat Pesanan</h2>
+            </div>
+            <p style="text-align: center; color: var(--gray); margin-bottom: 30px;">Lihat barang yang pernah Anda beli</p>
+
+            <div id="orderHistoryContainer">
+                <!-- Order history will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- MY ADDRESSES PAGE -->
+    <div id="myAddressesPage" class="page-section">
+        <section class="container my-products-page">
+            <!-- Header dengan tombol back -->
+            <div style="display: flex; align-items: center; padding: 20px 0 10px; gap: 15px;">
+                <button onclick="showPage('profile')" style="background: transparent; border: none; color: var(--pink-dark); font-size: 24px; cursor: pointer; padding: 5px; width: auto;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 style="margin: 0; font-size: 24px; color: var(--text); font-weight: 700;">Alamat Saya</h2>
+            </div>
+            <p style="text-align: center; color: var(--gray); margin-bottom: 30px;">Kelola alamat pengiriman Anda</p>
+
+            <div style="max-width: 800px; margin: 0 auto;">
+                <button class="btn btn-primary" onclick="showAddAddressModal()" style="width: 100%; margin-bottom: 20px;">
+                    <i class="fas fa-plus"></i> Tambah Alamat Baru
+                </button>
+
+                <div id="addressesContainer">
+                    <!-- Addresses will be loaded here -->
+                </div>
             </div>
         </section>
     </div>
@@ -3232,6 +3442,10 @@
         let currentChatSeller = null;
         let currentChatView = 'list'; // 'list' or 'detail'
 
+        // Address State
+        let addresses = [];
+        let editingAddressId = null;
+
         // Elemen DOM
         const productsContainer = document.getElementById('productsContainer');
         const cartItemsContainer = document.getElementById('cartItems');
@@ -3289,6 +3503,7 @@
                 case 'jual':
                     document.getElementById('jualPage').classList.add('active');
                     document.querySelector('.bottom-nav-item[onclick*="jual"]').classList.add('active');
+                    loadSellerInfoFromAddress();
                     break;
                 case 'profile':
                     document.getElementById('profilePage').classList.add('active');
@@ -3307,9 +3522,17 @@
                     document.getElementById('orderTrackingPage').classList.add('active');
                     renderOrderTracking();
                     break;
+                case 'orderHistory':
+                    document.getElementById('orderHistoryPage').classList.add('active');
+                    renderOrderHistory();
+                    break;
                 case 'editProfile':
                     document.getElementById('editProfilePage').classList.add('active');
                     loadEditProfileForm();
+                    break;
+                case 'myAddresses':
+                    document.getElementById('myAddressesPage').classList.add('active');
+                    renderAddresses();
                     break;
             }
 
@@ -3399,6 +3622,235 @@
                 `;
                 orderTrackingContainer.appendChild(orderCard);
             });
+        }
+
+        // Render Order History
+        function renderOrderHistory() {
+            const orderHistoryContainer = document.getElementById('orderHistoryContainer');
+            loadOrdersFromStorage();
+
+            // Filter hanya pesanan yang sudah delivered
+            const completedOrders = orders.filter(order => order.status === 'delivered');
+
+            if (completedOrders.length === 0) {
+                orderHistoryContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <h3>Belum Ada Riwayat</h3>
+                        <p>Anda belum memiliki pesanan yang selesai</p>
+                        <button class="btn btn-primary" onclick="showPage('home')" style="margin-top: 20px;">
+                            <i class="fas fa-shopping-bag"></i> Mulai Belanja
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            orderHistoryContainer.innerHTML = '';
+            completedOrders.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card';
+                
+                orderCard.innerHTML = `
+                    <div class="order-header">
+                        <div>
+                            <div class="order-id">Order #${order.id}</div>
+                            <div class="order-date">${order.date}</div>
+                        </div>
+                        <div class="status-badge delivered">
+                            <i class="fas fa-check-circle"></i> Selesai
+                        </div>
+                    </div>
+                    <div class="order-body">
+                        <div class="order-items">
+                            ${order.items.map(item => `
+                                <div class="order-item">
+                                    <div class="order-item-image">
+                                        <img src="${item.image}" alt="${item.name}">
+                                    </div>
+                                    <div class="order-item-info">
+                                        <div class="order-item-name">${item.name}</div>
+                                        <div class="order-item-details">Qty: ${item.quantity} | ${item.seller}</div>
+                                    </div>
+                                    <div class="order-item-price">Rp ${formatPrice(item.price * item.quantity)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="order-summary">
+                            <div class="order-summary-row">
+                                <span>Subtotal:</span>
+                                <span>Rp ${formatPrice(order.subtotal)}</span>
+                            </div>
+                            <div class="order-summary-row">
+                                <span>Ongkir (${order.shippingMethod}):</span>
+                                <span>Rp ${formatPrice(order.shippingCost)}</span>
+                            </div>
+                            <div class="order-summary-row">
+                                <span>Biaya Layanan:</span>
+                                <span>Rp ${formatPrice(order.serviceFee)}</span>
+                            </div>
+                            <div class="order-summary-row total">
+                                <span>Total:</span>
+                                <span>Rp ${formatPrice(order.total)}</span>
+                            </div>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn-track" onclick="showOrderHistoryDetail(${order.id})">
+                                <i class="fas fa-receipt"></i> Lihat Detail
+                            </button>
+                            <button class="btn-contact" onclick="buyAgain(${order.id})">
+                                <i class="fas fa-redo"></i> Beli Lagi
+                            </button>
+                        </div>
+                    </div>
+                `;
+                orderHistoryContainer.appendChild(orderCard);
+            });
+        }
+
+        function showOrderHistoryDetail(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            productModal.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            const shippingNames = {
+                'regular': 'Reguler (3-5 hari)',
+                'express': 'Express (1-2 hari)',
+                'sameday': 'Same Day'
+            };
+
+            // Cari tanggal diterima dari tracking
+            const deliveredStep = order.tracking.find(step => step.title === 'Pesanan Diterima');
+            const deliveredDate = deliveredStep?.time || order.date;
+
+            modalBody.innerHTML = `
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <h3 style="color: var(--pink-dark); margin-bottom: 20px;">
+                        <i class="fas fa-receipt"></i> Detail Pesanan #${order.id}
+                    </h3>
+                    
+                    <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #28a745;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <i class="fas fa-check-circle" style="color: #28a745; font-size: 24px;"></i>
+                            <div>
+                                <div style="font-weight: 700; color: #155724; font-size: 16px;">Pesanan Selesai</div>
+                                <div style="font-size: 13px; color: #155724;">Diterima pada ${deliveredDate}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--gray-light); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 15px; color: var(--pink-dark);">Informasi Pesanan</h4>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span style="font-weight: 600;">Tanggal Pesanan:</span>
+                            <span>${order.date}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span style="font-weight: 600;">Metode Pengiriman:</span>
+                            <span>${shippingNames[order.shippingMethod] || order.shippingMethod}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="font-weight: 600;">Metode Pembayaran:</span>
+                            <span>${order.paymentMethod}</span>
+                        </div>
+                    </div>
+
+                    <h4 style="color: var(--pink-dark); margin-bottom: 15px;">Produk yang Dibeli</h4>
+                    <div class="order-items" style="margin-bottom: 20px;">
+                        ${order.items.map(item => `
+                            <div class="order-item">
+                                <div class="order-item-image">
+                                    <img src="${item.image}" alt="${item.name}">
+                                </div>
+                                <div class="order-item-info">
+                                    <div class="order-item-name">${item.name}</div>
+                                    <div class="order-item-details">Qty: ${item.quantity} | ${item.seller}</div>
+                                </div>
+                                <div class="order-item-price">Rp ${formatPrice(item.price * item.quantity)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="order-summary">
+                        <div class="order-summary-row">
+                            <span>Subtotal:</span>
+                            <span>Rp ${formatPrice(order.subtotal)}</span>
+                        </div>
+                        <div class="order-summary-row">
+                            <span>Ongkir:</span>
+                            <span>Rp ${formatPrice(order.shippingCost)}</span>
+                        </div>
+                        <div class="order-summary-row">
+                            <span>Biaya Layanan:</span>
+                            <span>Rp ${formatPrice(order.serviceFee)}</span>
+                        </div>
+                        <div class="order-summary-row total">
+                            <span>Total Pembayaran:</span>
+                            <span>Rp ${formatPrice(order.total)}</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button class="btn-outline" onclick="buyAgain(${order.id}); closeDetailModal();" style="flex: 1;">
+                            <i class="fas fa-redo"></i> Beli Lagi
+                        </button>
+                        <button class="btn-primary" onclick="closeDetailModal()" style="flex: 1;">
+                            <i class="fas fa-check"></i> Tutup
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function buyAgain(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            let addedCount = 0;
+            let unavailableCount = 0;
+
+            order.items.forEach(item => {
+                // Cari produk yang sama di daftar produk
+                const product = products.find(p => 
+                    p.name === item.name && 
+                    p.seller === item.seller &&
+                    p.stock > 0
+                );
+
+                if (product) {
+                    // Tambahkan ke cart
+                    const existingItem = cart.find(cartItem => cartItem.product.id === product.id);
+                    const quantityToAdd = Math.min(item.quantity, product.stock);
+
+                    if (existingItem) {
+                        const newQuantity = Math.min(existingItem.quantity + quantityToAdd, product.stock);
+                        existingItem.quantity = newQuantity;
+                    } else {
+                        cart.push({
+                            product: product,
+                            quantity: quantityToAdd,
+                            selected: true
+                        });
+                    }
+                    addedCount++;
+                } else {
+                    unavailableCount++;
+                }
+            });
+
+            saveCartToStorage();
+            updateCartUI();
+
+            if (addedCount > 0 && unavailableCount > 0) {
+                showNotification(`${addedCount} produk ditambahkan ke keranjang. ${unavailableCount} produk tidak tersedia.`);
+            } else if (addedCount > 0) {
+                showNotification(`${addedCount} produk berhasil ditambahkan ke keranjang!`);
+            } else {
+                showNotification('Maaf, semua produk tidak tersedia lagi.');
+            }
         }
 
         function showOrderDetail(orderId) {
@@ -4989,17 +5441,12 @@
 
         function confirmCheckout() {
             const selectedItems = cart.filter(item => item.selected);
-            const subtotal = selectedItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
             
             const shippingCosts = {
                 'regular': 15000,
                 'express': 25000,
                 'sameday': 40000
             };
-            
-            const shippingCost = shippingCosts[selectedShipping];
-            const serviceFee = 5000;
-            const total = subtotal + shippingCost + serviceFee;
 
             const paymentNames = {
                 'transfer': 'Transfer Bank',
@@ -5014,84 +5461,108 @@
                 'sameday': 'Same Day'
             };
 
-            // Buat order baru
-            const newOrder = {
-                id: orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1001,
-                date: new Date().toLocaleDateString('id-ID', { 
-                    day: '2-digit', 
-                    month: 'long', 
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }),
-                items: selectedItems.map(item => ({
-                    name: item.product.name,
-                    image: item.product.image,
-                    price: item.product.price,
-                    quantity: item.quantity,
-                    seller: item.product.seller
-                })),
-                subtotal: subtotal,
-                shippingCost: shippingCost,
-                serviceFee: serviceFee,
-                total: total,
-                shippingMethod: shippingMethodNames[selectedShipping],
-                paymentMethod: paymentNames[selectedPayment],
-                status: 'processing',
-                tracking: [
-                    {
-                        title: 'Pesanan Dikonfirmasi',
-                        description: 'Pesanan Anda telah dikonfirmasi',
-                        icon: 'fa-check-circle',
-                        completed: true,
-                        active: false,
-                        time: new Date().toLocaleString('id-ID')
-                    },
-                    {
-                        title: 'Sedang Diproses',
-                        description: 'Penjual sedang memproses pesanan Anda',
-                        icon: 'fa-box',
-                        completed: false,
-                        active: true,
-                        time: ''
-                    },
-                    {
-                        title: 'Dalam Pengiriman',
-                        description: 'Paket sedang dalam perjalanan',
-                        icon: 'fa-truck',
-                        completed: false,
-                        active: false,
-                        time: ''
-                    },
-                    {
-                        title: 'Tiba di Kota Tujuan',
-                        description: 'Paket telah tiba di kota tujuan',
-                        icon: 'fa-building',
-                        completed: false,
-                        active: false,
-                        time: ''
-                    },
-                    {
-                        title: 'Sedang Dikirim ke Alamat',
-                        description: 'Kurir sedang mengirim ke alamat Anda',
-                        icon: 'fa-motorcycle',
-                        completed: false,
-                        active: false,
-                        time: ''
-                    },
-                    {
-                        title: 'Pesanan Diterima',
-                        description: 'Paket telah diterima',
-                        icon: 'fa-home',
-                        completed: false,
-                        active: false,
-                        time: ''
-                    }
-                ]
-            };
+            // Kelompokkan items berdasarkan penjual
+            const itemsBySeller = {};
+            selectedItems.forEach(item => {
+                const seller = item.product.seller;
+                if (!itemsBySeller[seller]) {
+                    itemsBySeller[seller] = [];
+                }
+                itemsBySeller[seller].push(item);
+            });
 
-            // Tambahkan order ke array
-            orders.unshift(newOrder);
+            // Buat order terpisah untuk setiap penjual
+            let totalOrdersCreated = 0;
+            let grandTotal = 0;
+
+            Object.keys(itemsBySeller).forEach(seller => {
+                const sellerItems = itemsBySeller[seller];
+                const sellerSubtotal = sellerItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+                const shippingCost = shippingCosts[selectedShipping];
+                const serviceFee = 5000;
+                const orderTotal = sellerSubtotal + shippingCost + serviceFee;
+                
+                grandTotal += orderTotal;
+
+                const newOrder = {
+                    id: orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 + totalOrdersCreated : 1001 + totalOrdersCreated,
+                    date: new Date().toLocaleDateString('id-ID', { 
+                        day: '2-digit', 
+                        month: 'long', 
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }),
+                    items: sellerItems.map(item => ({
+                        name: item.product.name,
+                        image: item.product.image,
+                        price: item.product.price,
+                        quantity: item.quantity,
+                        seller: item.product.seller
+                    })),
+                    subtotal: sellerSubtotal,
+                    shippingCost: shippingCost,
+                    serviceFee: serviceFee,
+                    total: orderTotal,
+                    shippingMethod: shippingMethodNames[selectedShipping],
+                    paymentMethod: paymentNames[selectedPayment],
+                    status: 'processing',
+                    tracking: [
+                        {
+                            title: 'Pesanan Dikonfirmasi',
+                            description: 'Pesanan Anda telah dikonfirmasi',
+                            icon: 'fa-check-circle',
+                            completed: true,
+                            active: false,
+                            time: new Date().toLocaleString('id-ID')
+                        },
+                        {
+                            title: 'Sedang Diproses',
+                            description: 'Penjual sedang memproses pesanan Anda',
+                            icon: 'fa-box',
+                            completed: false,
+                            active: true,
+                            time: ''
+                        },
+                        {
+                            title: 'Dalam Pengiriman',
+                            description: 'Paket sedang dalam perjalanan',
+                            icon: 'fa-truck',
+                            completed: false,
+                            active: false,
+                            time: ''
+                        },
+                        {
+                            title: 'Tiba di Kota Tujuan',
+                            description: 'Paket telah tiba di kota tujuan',
+                            icon: 'fa-building',
+                            completed: false,
+                            active: false,
+                            time: ''
+                        },
+                        {
+                            title: 'Sedang Dikirim ke Alamat',
+                            description: 'Kurir sedang mengirim ke alamat Anda',
+                            icon: 'fa-motorcycle',
+                            completed: false,
+                            active: false,
+                            time: ''
+                        },
+                        {
+                            title: 'Pesanan Diterima',
+                            description: 'Paket telah diterima',
+                            icon: 'fa-home',
+                            completed: false,
+                            active: false,
+                            time: ''
+                        }
+                    ]
+                };
+
+                orders.unshift(newOrder);
+                totalOrdersCreated++;
+            });
+
             saveOrdersToStorage();
 
             // Kurangi stok produk yang dibeli
@@ -5120,7 +5591,8 @@
 
             closeDetailModal();
             
-            showNotification(`Pesanan berhasil! Total: Rp ${formatPrice(total)} via ${paymentNames[selectedPayment]}`);
+            const sellerCount = Object.keys(itemsBySeller).length;
+            showNotification(`${totalOrdersCreated} pesanan berhasil dibuat dari ${sellerCount} penjual! Total: Rp ${formatPrice(grandTotal)}`);
         }
 
         function showNotification(message) {
@@ -5418,6 +5890,280 @@
                 
                 // Redirect ke halaman login
                 window.location.href = 'index.html';
+            }
+        }
+
+        // ========== ADDRESS MANAGEMENT FUNCTIONS ==========
+
+        function saveAddressesToStorage() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) return;
+
+            localStorage.setItem(`secondChanceAddresses_${currentUser}`, JSON.stringify(addresses));
+        }
+
+        function loadAddressesFromStorage() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) return;
+
+            const addressesData = localStorage.getItem(`secondChanceAddresses_${currentUser}`);
+            if (addressesData) {
+                addresses = JSON.parse(addressesData);
+            }
+        }
+
+        function renderAddresses() {
+            const addressesContainer = document.getElementById('addressesContainer');
+            loadAddressesFromStorage();
+
+            if (addresses.length === 0) {
+                addressesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>Belum Ada Alamat</h3>
+                        <p>Tambahkan alamat pengiriman untuk memudahkan checkout</p>
+                    </div>
+                `;
+                return;
+            }
+
+            addressesContainer.innerHTML = '';
+            addresses.forEach(address => {
+                const addressCard = document.createElement('div');
+                addressCard.className = `address-card ${address.isDefault ? 'default' : ''}`;
+                
+                addressCard.innerHTML = `
+                    <div class="address-header">
+                        <div>
+                            <span class="address-label">${address.label}</span>
+                        </div>
+                        ${address.isDefault ? '<span class="default-badge"><i class="fas fa-star"></i> Alamat Utama</span>' : ''}
+                    </div>
+                    <div class="address-info">
+                        <h4>${address.recipientName}</h4>
+                        <div class="phone">
+                            <i class="fas fa-phone"></i>
+                            <span>${address.phone}</span>
+                        </div>
+                        <p>${address.address}</p>
+                        <p>${address.city}, ${address.province} ${address.postalCode}</p>
+                        ${address.notes ? `<p style="font-style: italic; margin-top: 5px;"><i class="fas fa-info-circle"></i> ${address.notes}</p>` : ''}
+                    </div>
+                    <div class="address-actions">
+                        ${!address.isDefault ? `
+                            <button class="btn-set-default" onclick="setDefaultAddress(${address.id})">
+                                <i class="fas fa-star"></i> Jadikan Utama
+                            </button>
+                        ` : `
+                            <button class="btn-set-default active">
+                                <i class="fas fa-check"></i> Alamat Utama
+                            </button>
+                        `}
+                        <button class="btn-edit-address" onclick="editAddress(${address.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn-delete-address" onclick="deleteAddress(${address.id})">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                    </div>
+                `;
+                
+                addressesContainer.appendChild(addressCard);
+            });
+        }
+
+        function showAddAddressModal(addressId = null) {
+            editingAddressId = addressId;
+            const isEditing = addressId !== null;
+            const address = isEditing ? addresses.find(a => a.id === addressId) : null;
+
+            productModal.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            modalBody.innerHTML = `
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <h3 style="color: var(--pink-dark); margin-bottom: 20px; font-size: 20px;">
+                        <i class="fas fa-map-marker-alt"></i> ${isEditing ? 'Edit Alamat' : 'Tambah Alamat Baru'}
+                    </h3>
+                    
+                    <form id="addressForm" onsubmit="saveAddress(event)">
+                        <div class="form-group">
+                            <label for="addressLabel">Label Alamat *</label>
+                            <select id="addressLabel" required>
+                                <option value="Rumah" ${address?.label === 'Rumah' ? 'selected' : ''}>Rumah</option>
+                                <option value="Kantor" ${address?.label === 'Kantor' ? 'selected' : ''}>Kantor</option>
+                                <option value="Apartemen" ${address?.label === 'Apartemen' ? 'selected' : ''}>Apartemen</option>
+                                <option value="Lainnya" ${address?.label === 'Lainnya' ? 'selected' : ''}>Lainnya</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="recipientName">Nama Penerima *</label>
+                            <input type="text" id="recipientName" required placeholder="Nama lengkap penerima" value="${address?.recipientName || ''}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="recipientPhone">Nomor Telepon *</label>
+                            <input type="tel" id="recipientPhone" required placeholder="08xxxxxxxxxx" value="${address?.phone || ''}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fullAddress">Alamat Lengkap *</label>
+                            <textarea id="fullAddress" required placeholder="Jalan, nomor rumah, RT/RW, kelurahan, kecamatan" style="min-height: 80px;">${address?.address || ''}</textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="addressCity">Kota/Kabupaten *</label>
+                                <input type="text" id="addressCity" required placeholder="Contoh: Jakarta Selatan" value="${address?.city || ''}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="addressProvince">Provinsi *</label>
+                                <input type="text" id="addressProvince" required placeholder="Contoh: DKI Jakarta" value="${address?.province || ''}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="postalCode">Kode Pos *</label>
+                            <input type="text" id="postalCode" required placeholder="12345" maxlength="5" pattern="[0-9]{5}" value="${address?.postalCode || ''}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="addressNotes">Catatan/Patokan (Opsional)</label>
+                            <textarea id="addressNotes" placeholder="Contoh: Dekat minimarket, rumah cat hijau" style="min-height: 60px;">${address?.notes || ''}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; cursor: pointer; font-weight: 500;">
+                                <input type="checkbox" id="setAsDefault" ${address?.isDefault ? 'checked' : ''} style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer; accent-color: var(--pink-dark);">
+                                Jadikan alamat utama
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" onclick="closeDetailModal()">Batal</button>
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-save"></i> ${isEditing ? 'Simpan Perubahan' : 'Tambah Alamat'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+        }
+
+        function saveAddress(event) {
+            event.preventDefault();
+
+            const addressData = {
+                id: editingAddressId || Date.now(),
+                label: document.getElementById('addressLabel').value,
+                recipientName: document.getElementById('recipientName').value.trim(),
+                phone: document.getElementById('recipientPhone').value.trim(),
+                address: document.getElementById('fullAddress').value.trim(),
+                city: document.getElementById('addressCity').value.trim(),
+                province: document.getElementById('addressProvince').value.trim(),
+                postalCode: document.getElementById('postalCode').value.trim(),
+                notes: document.getElementById('addressNotes').value.trim(),
+                isDefault: document.getElementById('setAsDefault').checked
+            };
+
+            // Validate phone number
+            if (!/^08\d{8,11}$/.test(addressData.phone)) {
+                showNotification('Nomor telepon harus dimulai dengan 08 dan 10-13 digit');
+                return;
+            }
+
+            // Validate postal code
+            if (!/^\d{5}$/.test(addressData.postalCode)) {
+                showNotification('Kode pos harus 5 digit angka');
+                return;
+            }
+
+            if (editingAddressId) {
+                // Edit existing address
+                const index = addresses.findIndex(a => a.id === editingAddressId);
+                if (index !== -1) {
+                    // If setting as default, unset other defaults
+                    if (addressData.isDefault) {
+                        addresses.forEach(addr => addr.isDefault = false);
+                    }
+                    addresses[index] = addressData;
+                    showNotification('Alamat berhasil diperbarui!');
+                }
+            } else {
+                // Add new address
+                // If this is the first address or set as default, make it default
+                if (addresses.length === 0 || addressData.isDefault) {
+                    addresses.forEach(addr => addr.isDefault = false);
+                    addressData.isDefault = true;
+                }
+                addresses.push(addressData);
+                showNotification('Alamat berhasil ditambahkan!');
+            }
+
+            saveAddressesToStorage();
+            closeDetailModal();
+            renderAddresses();
+            editingAddressId = null;
+        }
+
+        function editAddress(addressId) {
+            showAddAddressModal(addressId);
+        }
+
+        function deleteAddress(addressId) {
+            if (!confirm('Yakin ingin menghapus alamat ini?')) return;
+
+            const address = addresses.find(a => a.id === addressId);
+            const wasDefault = address?.isDefault;
+
+            addresses = addresses.filter(a => a.id !== addressId);
+
+            // If deleted address was default, set first remaining address as default
+            if (wasDefault && addresses.length > 0) {
+                addresses[0].isDefault = true;
+            }
+
+            saveAddressesToStorage();
+            renderAddresses();
+            showNotification('Alamat berhasil dihapus');
+        }
+
+        function setDefaultAddress(addressId) {
+            // Unset all defaults
+            addresses.forEach(addr => addr.isDefault = false);
+
+            // Set selected address as default
+            const address = addresses.find(a => a.id === addressId);
+            if (address) {
+                address.isDefault = true;
+                saveAddressesToStorage();
+                renderAddresses();
+                showNotification('Alamat utama berhasil diubah');
+            }
+        }
+
+        function getDefaultAddress() {
+            return addresses.find(a => a.isDefault) || addresses[0] || null;
+        }
+
+        function loadSellerInfoFromAddress() {
+            loadAddressesFromStorage();
+            const defaultAddress = getDefaultAddress();
+            
+            const sellerInput = document.getElementById('productSeller');
+            const locationInput = document.getElementById('productLocation');
+            
+            if (defaultAddress) {
+                sellerInput.value = defaultAddress.recipientName;
+                locationInput.value = defaultAddress.city;
+            } else {
+                sellerInput.value = '';
+                locationInput.value = '';
+                sellerInput.placeholder = 'Tambahkan alamat terlebih dahulu';
+                locationInput.placeholder = 'Tambahkan alamat terlebih dahulu';
             }
         }
 
