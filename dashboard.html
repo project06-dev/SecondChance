@@ -2760,7 +2760,7 @@
         <section class="container my-products-page">
             <div class="page-header">
                 <h2><i class="fas fa-plus-circle"></i> Tambah Produk Baru</h2>
-                <p>Jual barang bekas Anda dengan mudah</p>
+                <p>Preloved barang anda dengan mudah & praktis</p>
             </div>
 
             <div style="max-width: 600px; margin: 0 auto;">
@@ -3147,7 +3147,7 @@
         </a>
         <a class="bottom-nav-item" onclick="showPage('jual')">
             <i class="fas fa-plus-circle"></i>
-            <span>Jual</span>
+            <span>Tambahkan Produk</span>
         </a>
         <a class="bottom-nav-item" onclick="showPage('profile')">
             <i class="fas fa-user"></i>
@@ -5727,8 +5727,8 @@
 
             const userData = JSON.parse(localStorage.getItem(currentUser));
             if (userData) {
-                // Update display values
-                const username = userData.email ? userData.email.split('@')[0] : '-';
+                // Update display values - gunakan username dari data user
+                const username = userData.username || (userData.email ? userData.email.split('@')[0] : '-');
                 document.getElementById('displayUsername').textContent = username;
                 
                 // Mask phone number
