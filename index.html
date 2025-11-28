@@ -18,6 +18,110 @@
             --shadow: rgba(179, 156, 217, 0.1);
         }
 
+        /* Loading Screen Styles */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e6ccff 0%, #b19cd9 50%, #d4a574 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Logo container */
+        .loading-logo {
+            width: 180px;
+            height: 180px;
+            background: white;
+            border-radius: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .loading-logo img {
+            width: 140px;
+            height: auto;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        }
+
+        /* Loading text */
+        .loading-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Spinner Container */
+        .spinner-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+
+        /* Rotating Spinner */
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Hide main content initially */
+        body.loading .container {
+            opacity: 0;
+        }
+
+        body:not(.loading) .container {
+            animation: fadeInContent 0.8s ease forwards;
+        }
+
+        @keyframes fadeInContent {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -202,7 +306,7 @@
         button {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, var(--primary-dark), var(--accent));
+            background: var(--primary-dark);
             color: var(--white);
             border: none;
             border-radius: 12px;
@@ -233,6 +337,21 @@
         button:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(177, 156, 217, 0.3);
+            background: #9770b5;
+        }
+
+        /* Guest Button Styling */
+        .guest-button {
+            background: transparent;
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+            margin-top: 10px;
+        }
+
+        .guest-button:hover {
+            background: var(--primary-light);
+            border-color: #9770b5;
+            color: #9770b5;
         }
 
         .form {
@@ -407,8 +526,50 @@
             }
         }
     </style>
+
+            <!-- Firebase SDK - TAMBAHKAN DI SINI, SEBELUM </head> -->
+    <script type="module">
+        // Import Firebase services
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDIYexUXizIp55K1pWOv6Ib1EIZONpIYis",
+            authDomain: "project-cuba.firebaseapp.com",
+            projectId: "project-cuba",
+            storageBucket: "project-cuba.firebasestorage.app",
+            messagingSenderId: "943123700788",
+            appId: "1:943123700788:web:0b10df43a27d2814a8be61",
+            measurementId: "G-4CWV41FM6B"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+    </script>
 </head>
-<body>
+<body class="loading">
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <!-- Logo -->
+            <div class="loading-logo">
+                <img src="https://i.imgur.com/Mfk3suT.png" alt="Second Chance Logo" />
+            </div>
+            
+            <!-- Loading text -->
+            <div class="loading-text">Second Chance</div>
+            
+            <!-- Rotating Spinner -->
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
     <img src="https://i.imgur.com/Mfk3suT.png" alt="Second Chance Logo" class="logo" />
@@ -431,6 +592,7 @@
                     </div>
                 </div>
                 <button type="submit">Masuk</button>
+                <button type="button" id="guest-login" class="guest-button">Masuk sebagai Guest</button>
                 <div class="message">
                     <a id="to-change-password">Lupa password? Klik di sini untuk mengubah</a>
                 </div>
@@ -526,7 +688,30 @@
         </div>
     </div>
 
-    <script>
+        <script type="module">
+        // Import Firebase functions
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { collection, doc, setDoc, getDoc, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        // Get auth and db from window (initialized in head)
+        const auth = window.auth;
+        const db = window.db;
+
+        // Loading Screen Control
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loading-screen');
+                const body = document.body;
+                
+                loadingScreen.classList.add('hidden');
+                body.classList.remove('loading');
+                
+                setTimeout(function() {
+                    loadingScreen.remove();
+                }, 800);
+            }, 2500);
+        });
+
         // Element references
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
@@ -563,12 +748,10 @@
             hide1.classList.remove('active');
             hide2.classList.remove('active');
 
-            // Clear forms and messages when switching
             clearForm(hide1);
             clearForm(hide2);
             successMessage.textContent = '';
             
-            // Show/hide header based on active form
             const header = document.querySelector('.header');
             if (show === loginForm) {
                 header.style.display = 'block';
@@ -591,7 +774,7 @@
         }
         
         // Toggle password visibility
-        function togglePassword(inputId) {
+        window.togglePassword = function(inputId) {
             const input = document.getElementById(inputId);
             if (input.type === 'password') {
                 input.type = 'text';
@@ -600,9 +783,8 @@
             }
         }
         
-                
-        // Form validation and submission
-        registerForm.addEventListener('submit', function(e) {
+        // ===== REGISTER FORM =====
+        registerForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const name = document.getElementById('register-name').value.trim();
@@ -634,13 +816,19 @@
             }
             
             // Check if username already exists
-            const existingUsers = Object.keys(localStorage).filter(key => key.startsWith('user_'));
-            for (let key of existingUsers) {
-                const userData = JSON.parse(localStorage.getItem(key));
-                if (userData.username && userData.username.toLowerCase() === username.toLowerCase()) {
+            try {
+                const usersRef = collection(db, 'users');
+                const q = query(usersRef, where('username', '==', username.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
                     usernameError.textContent = 'Username sudah digunakan';
                     return;
                 }
+            } catch (error) {
+                console.error('Error checking username:', error);
+                usernameError.textContent = 'Terjadi kesalahan, coba lagi';
+                return;
             }
             
             // Validate email format
@@ -648,15 +836,6 @@
             if (!emailRegex.test(email)) {
                 emailError.textContent = 'Format email tidak valid';
                 return;
-            }
-            
-            // Check if email already exists
-            for (let key of existingUsers) {
-                const userData = JSON.parse(localStorage.getItem(key));
-                if (userData.email && userData.email.toLowerCase() === email.toLowerCase()) {
-                    emailError.textContent = 'Email sudah terdaftar';
-                    return;
-                }
             }
             
             // Validate password
@@ -675,27 +854,38 @@
                 return;
             }
             
-            // Save user data
-            const userData = {
-                name: name,
-                username: username,
-                email: email,
-                phone: phone,
-                dob: dob,
-                password: password
-            };
-            
-            localStorage.setItem(`user_${username}`, JSON.stringify(userData));
-            
-            // Success
-            successMessage.textContent = 'Registrasi berhasil! Silakan login.';
-            setTimeout(() => {
-                switchForm(loginForm, registerForm, changePasswordForm);
-            }, 2000);
+            // Register with Firebase Auth
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Save additional user data to Firestore
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: name,
+                    username: username.toLowerCase(),
+                    email: email.toLowerCase(),
+                    phone: phone,
+                    dob: dob,
+                    createdAt: serverTimestamp()
+                });
+                
+                successMessage.textContent = 'Registrasi berhasil! Silakan login.';
+                setTimeout(() => {
+                    switchForm(loginForm, registerForm, changePasswordForm);
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                if (error.code === 'auth/email-already-in-use') {
+                    emailError.textContent = 'Email sudah terdaftar';
+                } else {
+                    emailError.textContent = 'Terjadi kesalahan: ' + error.message;
+                }
+            }
         });
-        
-        // Login form submission
-        loginForm.addEventListener('submit', function(e) {
+
+        // ===== LOGIN FORM =====
+        loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const identifier = document.getElementById('login-identifier').value.trim();
@@ -704,48 +894,63 @@
             
             loginError.textContent = '';
             
-            // Cari user berdasarkan username atau email
-            const existingUsers = Object.keys(localStorage).filter(key => key.startsWith('user_'));
-            let foundUser = null;
-            let userKey = null;
-            
-            for (let key of existingUsers) {
-                const userData = JSON.parse(localStorage.getItem(key));
-                if (userData.username && userData.username.toLowerCase() === identifier.toLowerCase()) {
-                    foundUser = userData;
-                    userKey = key;
-                    break;
+            try {
+                let email = identifier;
+                
+                // Jika identifier bukan email, cari email berdasarkan username
+                if (!identifier.includes('@')) {
+                    const usersRef = collection(db, 'users');
+                    const q = query(usersRef, where('username', '==', identifier.toLowerCase()));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (querySnapshot.empty) {
+                        loginError.textContent = 'Username tidak ditemukan';
+                        return;
+                    }
+                    
+                    email = querySnapshot.docs[0].data().email;
                 }
-                if (userData.email && userData.email.toLowerCase() === identifier.toLowerCase()) {
-                    foundUser = userData;
-                    userKey = key;
-                    break;
+                
+                // Login with Firebase Auth
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Get user data
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                const userData = userDoc.data();
+                
+                // Save to localStorage for quick access
+                localStorage.setItem('currentUser', JSON.stringify({
+                    uid: user.uid,
+                    email: user.email,
+                    ...userData
+                }));
+                
+                successMessage.textContent = 'Login berhasil!';
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                if (error.code === 'auth/user-not-found') {
+                    loginError.textContent = 'Email tidak ditemukan';
+                } else if (error.code === 'auth/wrong-password') {
+                    loginError.textContent = 'Password salah';
+                } else if (error.code === 'auth/invalid-credential') {
+                    loginError.textContent = 'Email atau password salah';
+                } else {
+                    loginError.textContent = 'Terjadi kesalahan: ' + error.message;
                 }
             }
-            
-            if (!foundUser) {
-                loginError.textContent = 'Username atau email tidak ditemukan';
-                return;
-            }
-            
-            if (foundUser.password !== password) {
-                loginError.textContent = 'Password salah';
-                return;
-            }
-            
-            // Set current user
-            localStorage.setItem('currentUser', userKey);
-            
-            successMessage.textContent = 'Login berhasil!';
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1500);
         });
         
-        // Change password form submission
-        changePasswordForm.addEventListener('submit', function(e) {
+        // ===== CHANGE PASSWORD FORM =====
+        changePasswordForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            const email = document.getElementById('change-email').value.trim();
+            const oldPassword = document.getElementById('old-password').value;
             const newPassword = document.getElementById('new-password').value;
             const confirmNewPassword = document.getElementById('confirm-new-password').value;
             const changePasswordError = document.getElementById('change-password-error');
@@ -767,10 +972,33 @@
                 return;
             }
             
-            successMessage.textContent = 'Password berhasil diubah!';
-            setTimeout(() => {
-                switchForm(loginForm, changePasswordForm, registerForm);
-            }, 2000);
+            try {
+                // Sign in first to get user
+                const userCredential = await signInWithEmailAndPassword(auth, email, oldPassword);
+                const user = userCredential.user;
+                
+                // Re-authenticate user
+                const credential = EmailAuthProvider.credential(email, oldPassword);
+                await reauthenticateWithCredential(user, credential);
+                
+                // Update password
+                await updatePassword(user, newPassword);
+                
+                successMessage.textContent = 'Password berhasil diubah!';
+                setTimeout(() => {
+                    switchForm(loginForm, changePasswordForm, registerForm);
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Change password error:', error);
+                if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    changePasswordError.textContent = 'Password lama salah';
+                } else if (error.code === 'auth/user-not-found') {
+                    changePasswordError.textContent = 'Email tidak ditemukan';
+                } else {
+                    changePasswordError.textContent = 'Terjadi kesalahan: ' + error.message;
+                }
+            }
         });
     </script>
 </body>
