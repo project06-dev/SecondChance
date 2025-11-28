@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -133,8 +133,16 @@
         .search-bar {
             flex: 1;
             max-width: 500px;
-            margin: 0 20px;
+            margin: 0 auto;
             position: relative;
+        }
+        
+        .logo {
+            min-width: 80px;
+        }
+        
+        .user-actions {
+            min-width: 80px;
         }
         
         .search-bar input {
@@ -2717,6 +2725,34 @@
             }
         }
     </style>
+                <!-- Firebase SDK - TAMBAHKAN SEBELUM </head> -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDIYexUXizIp55K1pWOv6Ib1EIZONpIYis",
+            authDomain: "project-cuba.firebaseapp.com",
+            projectId: "project-cuba",
+            storageBucket: "project-cuba.firebasestorage.app",
+            messagingSenderId: "943123700788",
+            appId: "1:943123700788:web:0b10df43a27d2814a8be61",
+            measurementId: "G-4CWV41FM6B"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+        
+        // Check authentication
+        onAuthStateChanged(window.auth, (user) => {
+            if (!user && !localStorage.getItem('isGuest')) {
+                // Redirect to login if not authenticated and not guest
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
 </head>
 <body>
     <!-- Header Section -->
@@ -4670,41 +4706,26 @@
         // Show guest badge and login button
         function setupGuestMode() {
             if (isGuestMode()) {
-                // Add guest badge to header
+                // Add login button (icon only)
                 const userActions = document.querySelector('.user-actions');
-                const guestBadge = document.createElement('div');
-                guestBadge.style.cssText = `
-                    background: linear-gradient(135deg, var(--pink-dark), var(--purple));
-                    color: white;
-                    padding: 8px 15px;
-                    border-radius: 20px;
-                    font-size: 13px;
-                    font-weight: 600;
-                    margin-right: 15px;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                `;
-                guestBadge.innerHTML = `
-                    <i class="fas fa-user-circle"></i>
-                    <span>Mode Guest</span>
-                `;
-                userActions.insertBefore(guestBadge, userActions.firstChild);
-
-                // Add login button
                 const loginBtn = document.createElement('a');
                 loginBtn.style.cssText = `
                     background: var(--pink-dark);
                     color: white;
-                    padding: 8px 20px;
-                    border-radius: 20px;
-                    font-size: 13px;
-                    font-weight: 600;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 18px;
                     margin-right: 15px;
                     cursor: pointer;
                     transition: all 0.3s;
+                    box-shadow: 0 2px 8px rgba(232, 62, 140, 0.3);
                 `;
-                loginBtn.innerHTML = `<i class="fas fa-sign-in-alt"></i> Login Sekarang`;
+                loginBtn.innerHTML = `<i class="fas fa-sign-in-alt"></i>`;
+                loginBtn.title = 'Login Sekarang';
                 loginBtn.onclick = () => {
                     if (confirm('Anda akan diarahkan ke halaman login. Lanjutkan?')) {
                         localStorage.removeItem('isGuest');
@@ -5070,47 +5091,48 @@
             document.body.style.overflow = '';
         }
 
-        function addToCart(productId, quantity = 1) {
-            // Check guest restriction
-            if (!checkGuestRestriction('menambahkan produk ke keranjang')) {
-                return;
-            }
-
-            const product = products.find(p => p.id === productId);
-            if (!product) return;
-            
-            // Cek stok produk
-            if (product.stock <= 0) {
-                showNotification('Maaf, stok produk ini sudah habis!');
-                return;
-            }
-            
-            const existingItem = cart.find(item => item.product.id === productId);
-            
-            // Hitung total quantity yang akan ada di cart
-            const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
-            const totalQuantity = currentQuantityInCart + quantity;
-            
-            // Validasi: pastikan total quantity tidak melebihi stok
-            if (totalQuantity > product.stock) {
-                showNotification(`Stok tersisa hanya ${product.stock} unit. Anda sudah memiliki ${currentQuantityInCart} di keranjang.`);
-                return;
-            }
-            
-            if (existingItem) {
-                existingItem.quantity += quantity;
-            } else {
-                cart.push({
-                    product: product,
-                    quantity: quantity,
-                    selected: true
-                });
-            }
-            
-            saveCartToStorage();
-            updateCartUI();
-            showNotification(`"${product.name}" ditambahkan ke keranjang`);
+        async function addToCart(productId, quantity = 1) {
+    if (!currentUserId) {
+        // Guest mode - gunakan localStorage
+        const product = products.find(p => p.id == productId);
+        if (!product) return;
+        
+        const existingItem = cart.find(item => item.id == productId);
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            cart.push({ ...product, quantity: quantity, selected: true });
         }
+        
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartUI();
+        showNotification('Produk ditambahkan ke keranjang');
+        return;
+    }
+    
+    // Firebase mode
+    try {
+        const cartItemRef = doc(db, 'carts', currentUserId, 'items', productId.toString());
+        const cartItemSnap = await getDoc(cartItemRef);
+        
+        if (cartItemSnap.exists()) {
+            await updateDoc(cartItemRef, {
+                quantity: increment(quantity)
+            });
+        } else {
+            await setDoc(cartItemRef, {
+                quantity: quantity,
+                selected: true,
+                addedAt: serverTimestamp()
+            });
+        }
+        
+        showNotification('Produk ditambahkan ke keranjang');
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        showNotification('Gagal menambahkan ke keranjang', 'error');
+    }
+}
 
         function removeFromCart(productId) {
             cart = cart.filter(item => item.product.id !== productId);
@@ -6186,6 +6208,7 @@
                 </div>
             `;
         }
+        
 
         function saveAddress(event) {
             event.preventDefault();
