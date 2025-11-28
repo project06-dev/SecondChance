@@ -25,6 +25,17 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
+        /* Remove outline from all buttons and inputs */
+        button:focus,
+        button:active,
+        input:focus,
+        textarea:focus,
+        select:focus,
+        a:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
         
         body {
     background-color: var(--white);
@@ -693,6 +704,7 @@
         .btn-submit {
             background-color: var(--pink-dark);
             color: white;
+            outline: none;
         }
 
         .btn-submit:hover {
@@ -700,14 +712,23 @@
             transform: translateY(-2px);
         }
 
+        .btn-submit:focus {
+            outline: none;
+        }
+
         .btn-cancel {
             background-color: var(--gray-light);
             color: var(--gray);
+            outline: none;
         }
 
         .btn-cancel:hover {
             background-color: var(--gray);
             color: white;
+        }
+
+        .btn-cancel:focus {
+            outline: none;
         }
 
         /* Product Detail Modal */
@@ -4633,10 +4654,106 @@
             showNotification('Gambar dihapus');
         }
 
+        // Check if user is guest
+        function isGuestMode() {
+            const isGuest = localStorage.getItem('isGuest');
+            return isGuest === 'true';
+        }
+
+        // Show guest badge and login button
+        function setupGuestMode() {
+            if (isGuestMode()) {
+                // Add guest badge to header
+                const userActions = document.querySelector('.user-actions');
+                const guestBadge = document.createElement('div');
+                guestBadge.style.cssText = `
+                    background: linear-gradient(135deg, var(--pink-dark), var(--purple));
+                    color: white;
+                    padding: 8px 15px;
+                    border-radius: 20px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    margin-right: 15px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                `;
+                guestBadge.innerHTML = `
+                    <i class="fas fa-user-circle"></i>
+                    <span>Mode Guest</span>
+                `;
+                userActions.insertBefore(guestBadge, userActions.firstChild);
+
+                // Add login button
+                const loginBtn = document.createElement('a');
+                loginBtn.style.cssText = `
+                    background: var(--pink-dark);
+                    color: white;
+                    padding: 8px 20px;
+                    border-radius: 20px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    margin-right: 15px;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                `;
+                loginBtn.innerHTML = `<i class="fas fa-sign-in-alt"></i> Login Sekarang`;
+                loginBtn.onclick = () => {
+                    if (confirm('Anda akan diarahkan ke halaman login. Lanjutkan?')) {
+                        localStorage.removeItem('isGuest');
+                        localStorage.removeItem('currentUser');
+                        window.location.href = 'index.html';
+                    }
+                };
+                userActions.insertBefore(loginBtn, userActions.firstChild);
+
+                // Update profile name
+                document.querySelector('.profile-name').textContent = 'Guest User';
+                document.querySelector('.profile-email').textContent = 'Silakan login untuk akses penuh';
+            }
+        }
+
+        // Check if guest can perform action
+        function checkGuestRestriction(actionName) {
+            if (isGuestMode()) {
+                const modal = document.getElementById('productModal');
+                const overlay = document.getElementById('overlay');
+                
+                modal.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                document.getElementById('modalBody').innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <i class="fas fa-lock" style="font-size: 64px; color: var(--pink-dark); margin-bottom: 20px;"></i>
+                        <h3 style="color: var(--pink-dark); margin-bottom: 15px;">Login Diperlukan</h3>
+                        <p style="color: var(--gray); margin-bottom: 30px;">
+                            Silakan login terlebih dahulu untuk ${actionName}
+                        </p>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button class="btn-cancel" onclick="closeDetailModal()">Nanti Saja</button>
+                            <button class="btn-submit" onclick="redirectToLogin()">
+                                <i class="fas fa-sign-in-alt"></i> Login Sekarang
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return false;
+            }
+            return true;
+        }
+
+        function redirectToLogin() {
+            localStorage.removeItem('isGuest');
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
         // Inisialisasi aplikasi
         async function initApp() {
             try {
                 await initDB();
+                setupGuestMode(); // Setup guest mode if applicable
                 currentProducts = [...products];
                 renderProducts();
                 loadCartFromStorage();
@@ -4947,6 +5064,11 @@
         }
 
         function addToCart(productId, quantity = 1) {
+            // Check guest restriction
+            if (!checkGuestRestriction('menambahkan produk ke keranjang')) {
+                return;
+            }
+
             const product = products.find(p => p.id === productId);
             if (!product) return;
             
@@ -5270,6 +5392,11 @@
         }
 
         function proceedToCheckout() {
+            // Check guest restriction
+            if (!checkGuestRestriction('melakukan checkout')) {
+                return;
+            }
+
             const selectedItems = cart.filter(item => item.selected);
             
             if (selectedItems.length === 0) {
