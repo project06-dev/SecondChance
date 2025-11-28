@@ -2648,12 +2648,19 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .header-top {
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: wrap;
             }
             
             .search-bar {
-                margin: 15px 0;
+                margin: 10px 0;
                 max-width: 100%;
+                order: 3;
+                flex-basis: 100%;
+            }
+
+            .user-actions {
+                order: 2;
             }
             
             .categories {
