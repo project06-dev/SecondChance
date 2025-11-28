@@ -945,6 +945,23 @@
             }
         });
         
+        // ===== GUEST LOGIN =====
+        const guestLoginBtn = document.getElementById('guest-login');
+        guestLoginBtn.addEventListener('click', function() {
+            // Set guest mode in localStorage
+            localStorage.setItem('isGuest', 'true');
+            localStorage.setItem('currentUser', JSON.stringify({
+                name: 'Guest',
+                username: 'guest',
+                isGuest: true
+            }));
+            
+            successMessage.textContent = 'Masuk sebagai Guest...';
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        });
+
         // ===== CHANGE PASSWORD FORM =====
         changePasswordForm.addEventListener('submit', async function(e) {
             e.preventDefault();
