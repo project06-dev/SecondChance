@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -2730,6 +2730,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
         import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+        import { getDatabase } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDIYexUXizIp55K1pWOv6Ib1EIZONpIYis",
@@ -2738,12 +2739,16 @@
             storageBucket: "project-cuba.firebasestorage.app",
             messagingSenderId: "943123700788",
             appId: "1:943123700788:web:0b10df43a27d2814a8be61",
-            measurementId: "G-4CWV41FM6B"
+            measurementId: "G-4CWV41FM6B",
+            databaseURL: "https://project-cuba-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
 
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
         const app = initializeApp(firebaseConfig);
         window.auth = getAuth(app);
         window.db = getFirestore(app);
+        window.rtdb = getDatabase(app);
         
         // Check authentication
         onAuthStateChanged(window.auth, (user) => {
@@ -2753,6 +2758,10 @@
             }
         });
     </script>
+    
+    <!-- Firebase Chat Modules -->
+    <script type="module" src="firebase-chat.js"></script>
+    <script type="module" src="dashboard-chat-firebase.js"></script>
 </head>
 <body>
     <!-- Header Section -->
