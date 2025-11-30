@@ -2773,10 +2773,6 @@
     <!-- Firebase Chat Modules -->
     <script type="module" src="firebase-chat.js"></script>
     <script type="module" src="dashboard-chat-firebase.js"></script>
-    
-    <!-- Firebase Product Modules -->
-    <script src="product-firebase.js"></script>
-    <script src="dashboard-product-integration.js"></script>
 </head>
 <body>
     <!-- Header Section -->
@@ -2893,17 +2889,17 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="productSeller">Nama Penjual *</label>
-                            <input type="text" id="productSeller" required placeholder="Nama Anda" readonly style="background-color: var(--gray-light); cursor: not-allowed;">
+                            <input type="text" id="productSeller" placeholder="Nama Anda">
                             <small style="color: var(--gray); font-size: 12px; margin-top: 5px; display: block;">
-                                <i class="fas fa-info-circle"></i> Diambil dari alamat utama Anda
+                                <i class="fas fa-info-circle"></i> Diambil dari alamat utama (opsional)
                             </small>
                         </div>
                         
                         <div class="form-group">
                             <label for="productLocation">Lokasi *</label>
-                            <input type="text" id="productLocation" required placeholder="Jakarta Selatan" readonly style="background-color: var(--gray-light); cursor: not-allowed;">
+                            <input type="text" id="productLocation" placeholder="Jakarta Selatan">
                             <small style="color: var(--gray); font-size: 12px; margin-top: 5px; display: block;">
-                                <i class="fas fa-info-circle"></i> Diambil dari alamat utama Anda
+                                <i class="fas fa-info-circle"></i> Diambil dari alamat utama (opsional)
                             </small>
                         </div>
                     </div>
@@ -5872,8 +5868,8 @@
                 category: document.getElementById('productCategory').value,
                 images: [...uploadedImages],
                 image: uploadedImages[0],
-                seller: document.getElementById('productSeller').value.trim(),
-                location: document.getElementById('productLocation').value.trim(),
+                seller: document.getElementById('productSeller').value.trim() || 'Anonymous',
+                location: document.getElementById('productLocation').value.trim() || 'Unknown',
                 stock: parseInt(document.getElementById('productStock').value),
                 description: document.getElementById('productDescription').value.trim(),
                 details: {
@@ -5893,48 +5889,51 @@
             const currentUser = localStorage.getItem('currentUser');
             const isGuest = localStorage.getItem('isGuest') === 'true';
 
+            // Always add to local array first (for immediate display)
+            newProduct.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+            products.unshift(newProduct);
+            currentProducts = [...products];
+            renderProducts();
+
             if (isGuest || !currentUser) {
-                // Guest mode - just add to local array (temporary)
-                newProduct.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-                products.unshift(newProduct);
+                // Guest mode - only local storage
                 showNotification('⚠️ Mode Guest: Produk hanya tersimpan sementara. Login untuk menyimpan permanen!');
             } else {
-                // Logged in - save to Firestore
-                try {
-                    showNotification('💾 Menyimpan produk ke database...');
-                    
-                    // Get user data
-                    const userData = JSON.parse(currentUser);
-                    newProduct.userId = userData.email || 'unknown';
-                    newProduct.userName = userData.name || 'Unknown';
-                    
-                    // Save to Firestore
-                    const docRef = await window.firestoreAddDoc(
-                        window.firestoreCollection(window.db, 'products'),
-                        {
-                            ...newProduct,
-                            createdAt: window.firestoreServerTimestamp(),
-                            updatedAt: window.firestoreServerTimestamp()
+                // Logged in - try to save to Firestore in background
+                setTimeout(async () => {
+                    try {
+                        if (window.db && window.firestoreAddDoc && window.firestoreCollection) {
+                            const userData = JSON.parse(currentUser);
+                            newProduct.userId = userData.email || 'unknown';
+                            newProduct.userName = userData.name || 'Unknown';
+                            
+                            const docRef = await window.firestoreAddDoc(
+                                window.firestoreCollection(window.db, 'products'),
+                                {
+                                    ...newProduct,
+                                    createdAt: window.firestoreServerTimestamp(),
+                                    updatedAt: window.firestoreServerTimestamp()
+                                }
+                            );
+                            
+                            // Update product with Firestore ID
+                            const productIndex = products.findIndex(p => p.id === newProduct.id);
+                            if (productIndex !== -1) {
+                                products[productIndex].firestoreId = docRef.id;
+                            }
+                            
+                            console.log('✅ Product saved to Firestore:', docRef.id);
                         }
-                    );
-                    
-                    // Add to local array with Firestore ID
-                    newProduct.id = docRef.id;
-                    newProduct.firestoreId = docRef.id;
-                    products.unshift(newProduct);
-                    
-                    console.log('✅ Product saved to Firestore:', docRef.id);
-                    showNotification('✅ Produk berhasil disimpan ke database!');
-                } catch (error) {
-                    console.error('❌ Error saving product:', error);
-                    showNotification('❌ Gagal menyimpan: ' + error.message);
-                    return;
-                }
+                    } catch (error) {
+                        console.error('❌ Error saving to Firestore:', error);
+                    }
+                }, 1000);
+                
+                showNotification('✅ Produk berhasil ditambahkan!');
             }
 
             activeCategory = 'all';
             searchInput.value = '';
-            currentProducts = [...products];
 
             categoryFilters.forEach(filter => {
                 if (filter.getAttribute('data-category') === 'all') {
@@ -5943,8 +5942,6 @@
                     filter.classList.remove('active');
                 }
             });
-
-            renderProducts();
 
             // Reset form
             document.getElementById('addProductForm').reset();
