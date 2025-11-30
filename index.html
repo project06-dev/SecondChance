@@ -608,12 +608,6 @@
                     <input type="text" id="register-name" placeholder="Masukkan nama lengkap" required>
                 </div>
                 <div class="form-group">
-                    <label for="register-username">Username</label>
-                    <input type="text" id="register-username" placeholder="Masukkan username" required minlength="3" pattern="[a-zA-Z0-9_]+" title="Username hanya boleh huruf, angka, dan underscore">
-                    <div class="requirements">Minimal 3 karakter, hanya huruf, angka, dan underscore</div>
-                    <div class="error" id="username-error"></div>
-                </div>
-                <div class="form-group">
                     <label for="register-dob">Tanggal Lahir</label>
                     <input type="date" id="register-dob" required>
                 </div>
@@ -788,48 +782,18 @@
             e.preventDefault();
             
             const name = document.getElementById('register-name').value.trim();
-            const username = document.getElementById('register-username').value.trim();
             const dob = document.getElementById('register-dob').value;
             const email = document.getElementById('register-email').value.trim();
             const phone = document.getElementById('register-phone').value.trim();
             const password = document.getElementById('register-password').value;
             const confirmPassword = document.getElementById('register-confirm-password').value;
             
-            const usernameError = document.getElementById('username-error');
             const emailError = document.getElementById('email-error');
             const passwordError = document.getElementById('password-error');
             
             // Clear previous errors
-            usernameError.textContent = '';
             emailError.textContent = '';
             passwordError.textContent = '';
-            
-            // Validate username
-            if (username.length < 3) {
-                usernameError.textContent = 'Username minimal 3 karakter';
-                return;
-            }
-            
-            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-                usernameError.textContent = 'Username hanya boleh huruf, angka, dan underscore';
-                return;
-            }
-            
-            // Check if username already exists
-            try {
-                const usersRef = collection(db, 'users');
-                const q = query(usersRef, where('username', '==', username.toLowerCase()));
-                const querySnapshot = await getDocs(q);
-                
-                if (!querySnapshot.empty) {
-                    usernameError.textContent = 'Username sudah digunakan';
-                    return;
-                }
-            } catch (error) {
-                console.error('Error checking username:', error);
-                usernameError.textContent = 'Terjadi kesalahan, coba lagi';
-                return;
-            }
             
             // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -859,10 +823,13 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
+                // Generate username from email (before @)
+                const username = email.split('@')[0].toLowerCase();
+                
                 // Save additional user data to Firestore
                 await setDoc(doc(db, 'users', user.uid), {
                     name: name,
-                    username: username.toLowerCase(),
+                    username: username,
                     email: email.toLowerCase(),
                     phone: phone,
                     dob: dob,
