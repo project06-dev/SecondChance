@@ -2744,7 +2744,6 @@
         };
 
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
         const app = initializeApp(firebaseConfig);
         window.auth = getAuth(app);
         window.db = getFirestore(app);
@@ -2760,6 +2759,10 @@
         window.firestoreServerTimestamp = serverTimestamp;
         window.firestoreQuery = query;
         window.firestoreOrderBy = orderBy;
+        
+        // Set flag that Firebase is ready
+        window.firebaseReady = true;
+        console.log('🔥 Firebase SDK loaded and ready!');
         
         // Check authentication
         onAuthStateChanged(window.auth, (user) => {
@@ -4807,7 +4810,7 @@
                 const currentUser = localStorage.getItem('currentUser');
                 const isGuest = localStorage.getItem('isGuest') === 'true';
                 
-                if (!isGuest && currentUser) {
+                if (!isGuest && currentUser && window.db && window.firestoreQuery) {
                     try {
                         console.log('📦 Loading products from Firestore...');
                         const q = window.firestoreQuery(
@@ -4839,6 +4842,8 @@
                     } catch (error) {
                         console.error('❌ Error loading products from Firestore:', error);
                     }
+                } else if (!isGuest && currentUser) {
+                    console.warn('⚠️ Firestore not ready yet, skipping product load');
                 }
                 
                 currentProducts = [...products];
@@ -5899,14 +5904,20 @@
                 // Guest mode - only local storage
                 showNotification('⚠️ Mode Guest: Produk hanya tersimpan sementara. Login untuk menyimpan permanen!');
             } else {
-                // Logged in - try to save to Firestore in background
-                setTimeout(async () => {
-                    try {
-                        if (window.db && window.firestoreAddDoc && window.firestoreCollection) {
+                // Logged in - wait for Firebase then save
+                showNotification('✅ Produk berhasil ditambahkan!');
+                
+                // Wait for Firebase SDK to be ready, then save
+                const waitForFirebase = setInterval(async () => {
+                    if (window.firebaseReady && window.db && window.firestoreAddDoc && window.firestoreCollection) {
+                        clearInterval(waitForFirebase);
+                        
+                        try {
                             const userData = JSON.parse(currentUser);
                             newProduct.userId = userData.email || 'unknown';
                             newProduct.userName = userData.name || 'Unknown';
                             
+                            console.log('💾 Saving to Firestore...');
                             const docRef = await window.firestoreAddDoc(
                                 window.firestoreCollection(window.db, 'products'),
                                 {
@@ -5920,16 +5931,24 @@
                             const productIndex = products.findIndex(p => p.id === newProduct.id);
                             if (productIndex !== -1) {
                                 products[productIndex].firestoreId = docRef.id;
+                                products[productIndex].id = docRef.id; // Use Firestore ID as main ID
                             }
                             
                             console.log('✅ Product saved to Firestore:', docRef.id);
+                        } catch (error) {
+                            console.error('❌ Error saving to Firestore:', error);
+                            console.error('Error details:', error.message);
                         }
-                    } catch (error) {
-                        console.error('❌ Error saving to Firestore:', error);
                     }
-                }, 1000);
+                }, 100); // Check every 100ms
                 
-                showNotification('✅ Produk berhasil ditambahkan!');
+                // Timeout after 10 seconds
+                setTimeout(() => {
+                    clearInterval(waitForFirebase);
+                    if (!window.firebaseReady) {
+                        console.error('❌ Firebase SDK timeout - not ready after 10s');
+                    }
+                }, 10000);
             }
 
             activeCategory = 'all';
@@ -5964,10 +5983,16 @@
                 return;
             }
 
-            const userData = JSON.parse(localStorage.getItem(currentUser));
-            if (userData) {
-                document.querySelector('.profile-name').textContent = userData.name || 'Pengguna Second Chance';
-                document.querySelector('.profile-email').textContent = userData.email || 'user@secondchance.com';
+            try {
+                const userData = JSON.parse(currentUser);
+                if (userData) {
+                    document.querySelector('.profile-name').textContent = userData.name || 'Pengguna Second Chance';
+                    document.querySelector('.profile-email').textContent = userData.email || 'user@secondchance.com';
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                document.querySelector('.profile-name').textContent = 'Pengguna Second Chance';
+                document.querySelector('.profile-email').textContent = 'user@secondchance.com';
             }
         }
 
