@@ -4806,6 +4806,45 @@
             try {
                 await initDB();
                 setupGuestMode(); // Setup guest mode if applicable
+                
+                // Load products from Firestore if logged in
+                const currentUser = localStorage.getItem('currentUser');
+                const isGuest = localStorage.getItem('isGuest') === 'true';
+                
+                if (!isGuest && currentUser) {
+                    try {
+                        console.log('📦 Loading products from Firestore...');
+                        const q = window.firestoreQuery(
+                            window.firestoreCollection(window.db, 'products'),
+                            window.firestoreOrderBy('createdAt', 'desc')
+                        );
+                        
+                        const querySnapshot = await window.firestoreGetDocs(q);
+                        const firestoreProducts = [];
+                        
+                        const userData = JSON.parse(currentUser);
+                        const userEmail = userData.email;
+
+                        querySnapshot.forEach((doc) => {
+                            const productData = doc.data();
+                            firestoreProducts.push({
+                                id: doc.id,
+                                firestoreId: doc.id,
+                                ...productData,
+                                isMine: productData.userId === userEmail
+                            });
+                        });
+
+                        if (firestoreProducts.length > 0) {
+                            // Merge Firestore products with sample products
+                            products = [...firestoreProducts, ...products.filter(p => !p.userId)];
+                            console.log(`✅ Loaded ${firestoreProducts.length} products from Firestore`);
+                        }
+                    } catch (error) {
+                        console.error('❌ Error loading products from Firestore:', error);
+                    }
+                }
+                
                 currentProducts = [...products];
                 renderProducts();
                 loadCartFromStorage();
@@ -4813,19 +4852,19 @@
                 loadWishlistFromStorage();
                 updateCartUI();
                 updateChatCount();
-                
+
                 categoryFilters.forEach(filter => {
                     filter.addEventListener('click', function(e) {
                         e.preventDefault();
                         const category = this.getAttribute('data-category');
-                        
+
                         categoryFilters.forEach(f => f.classList.remove('active'));
                         this.classList.add('active');
-                        
+
                         filterByCategory(category);
                     });
                 });
-                
+
                 searchInput.addEventListener('keyup', (e) => {
                     if (e.key === 'Enter') {
                         searchProducts();
@@ -5820,14 +5859,13 @@
 
         async function submitNewProduct(event) {
             event.preventDefault();
-            
+
             if (uploadedImages.length === 0) {
                 showNotification('Minimal upload 1 foto produk!');
                 return;
             }
-            
+
             const newProduct = {
-                id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
                 name: document.getElementById('productName').value.trim(),
                 price: parseInt(document.getElementById('productPrice').value),
                 originalPrice: parseInt(document.getElementById('productOriginalPrice').value),
@@ -5839,24 +5877,65 @@
                 stock: parseInt(document.getElementById('productStock').value),
                 description: document.getElementById('productDescription').value.trim(),
                 details: {
-                    merek: document.getElementById('productBrand').value.trim() || 'Tidak disebutkan',
+                    merek: document.getElementById('productBrand').value.trim() || 'Tidak disebutkan',    
                     kondisi: document.getElementById('productCondition').value,
-                    berat: document.getElementById('productWeight').value.trim() || 'Tidak disebutkan'
+                    berat: document.getElementById('productWeight').value.trim() || 'Tidak disebutkan'    
                 },
                 isMine: true
             };
-            
+
             if (newProduct.price >= newProduct.originalPrice) {
                 showNotification('Harga jual harus lebih rendah dari harga asli!');
                 return;
             }
-            
-            products.unshift(newProduct);
-            
+
+            // Check if user is logged in (not guest)
+            const currentUser = localStorage.getItem('currentUser');
+            const isGuest = localStorage.getItem('isGuest') === 'true';
+
+            if (isGuest || !currentUser) {
+                // Guest mode - just add to local array (temporary)
+                newProduct.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+                products.unshift(newProduct);
+                showNotification('⚠️ Mode Guest: Produk hanya tersimpan sementara. Login untuk menyimpan permanen!');
+            } else {
+                // Logged in - save to Firestore
+                try {
+                    showNotification('💾 Menyimpan produk ke database...');
+                    
+                    // Get user data
+                    const userData = JSON.parse(currentUser);
+                    newProduct.userId = userData.email || 'unknown';
+                    newProduct.userName = userData.name || 'Unknown';
+                    
+                    // Save to Firestore
+                    const docRef = await window.firestoreAddDoc(
+                        window.firestoreCollection(window.db, 'products'),
+                        {
+                            ...newProduct,
+                            createdAt: window.firestoreServerTimestamp(),
+                            updatedAt: window.firestoreServerTimestamp()
+                        }
+                    );
+                    
+                    // Add to local array with Firestore ID
+                    newProduct.id = docRef.id;
+                    newProduct.firestoreId = docRef.id;
+                    products.unshift(newProduct);
+                    
+                    console.log('✅ Product saved to Firestore:', docRef.id);
+                    showNotification('✅ Produk berhasil disimpan ke database!');
+                } catch (error) {
+                    console.error('❌ Error saving product:', error);
+                    showNotification('❌ Gagal menyimpan: ' + error.message);
+                    return;
+                }
+            }
+
             activeCategory = 'all';
             searchInput.value = '';
             currentProducts = [...products];
-            
+
             categoryFilters.forEach(filter => {
                 if (filter.getAttribute('data-category') === 'all') {
                     filter.classList.add('active');
@@ -5864,18 +5943,16 @@
                     filter.classList.remove('active');
                 }
             });
-            
+
             renderProducts();
-            
+
             // Reset form
             document.getElementById('addProductForm').reset();
             uploadedImages = [];
             document.getElementById('imagesPreviewContainer').classList.remove('active');
             document.getElementById('imagesPreviewGrid').innerHTML = '';
             document.getElementById('imageCount').textContent = '0';
-            
-            showNotification('Produk berhasil ditambahkan!');
-            
+
             // Kembali ke home page
             showPage('home');
         }
