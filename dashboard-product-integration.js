@@ -5,23 +5,31 @@ console.log('🔄 Loading Product Firebase Integration...');
 
 // Initialize ProductFirebase when DOM is ready
 let productFirebase = null;
+let integrationReady = false;
 
 // Wait for window.db to be available
 const initProductFirebase = () => {
     if (window.db && window.ProductFirebase) {
         productFirebase = new window.ProductFirebase(window.db);
+        integrationReady = true;
         console.log('✅ ProductFirebase initialized');
         
         // Load products from Firestore on init
         loadProductsFromFirestore();
     } else {
-        console.log('⏳ Waiting for Firebase...');
+        console.log('⏳ Waiting for Firebase... (db:', !!window.db, 'ProductFirebase:', !!window.ProductFirebase, ')');
         setTimeout(initProductFirebase, 500);
     }
 };
 
-// Start initialization
-setTimeout(initProductFirebase, 1000);
+// Start initialization after DOM is fully loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initProductFirebase, 1500);
+    });
+} else {
+    setTimeout(initProductFirebase, 1500);
+}
 
 // Load products from Firestore
 async function loadProductsFromFirestore() {
@@ -62,8 +70,15 @@ async function loadProductsFromFirestore() {
     }
 }
 
-// Override submitNewProduct function
-window.submitNewProduct = async function(event) {
+// Store original function
+const originalSubmitNewProduct = window.submitNewProduct;
+
+// Override submitNewProduct function - wait until it exists
+const overrideSubmitNewProduct = () => {
+    if (typeof window.submitNewProduct === 'function' && window.submitNewProduct !== overrideSubmitNewProduct) {
+        console.log('🔄 Overriding submitNewProduct...');
+        
+        window.submitNewProduct = async function(event) {
     event.preventDefault();
     
     if (window.uploadedImages.length === 0) {
@@ -140,12 +155,26 @@ window.submitNewProduct = async function(event) {
     document.getElementById('imagesPreviewGrid').innerHTML = '';
     document.getElementById('imageCount').textContent = '0';
     
-    // Kembali ke home page
-    window.showPage('home');
+            // Kembali ke home page
+            window.showPage('home');
+        };
+        
+        console.log('✅ submitNewProduct overridden!');
+    } else {
+        console.log('⏳ Waiting for submitNewProduct to exist...');
+        setTimeout(overrideSubmitNewProduct, 500);
+    }
 };
 
-// Override deleteProduct function
-window.deleteProduct = async function(productId) {
+// Start override after a delay
+setTimeout(overrideSubmitNewProduct, 2000);
+
+// Override deleteProduct function - wait until it exists
+const overrideDeleteProduct = () => {
+    if (typeof window.deleteProduct === 'function') {
+        console.log('🔄 Overriding deleteProduct...');
+        
+        window.deleteProduct = async function(productId) {
     if (!confirm('Yakin ingin menghapus produk ini?')) return;
     
     const product = window.products.find(p => p.id === productId);
@@ -171,10 +200,18 @@ window.deleteProduct = async function(productId) {
     window.renderProducts();
     window.renderMyProducts();
     
-    if (!product.firestoreId) {
-        window.showNotification('Produk berhasil dihapus');
+            if (!product.firestoreId) {
+                window.showNotification('Produk berhasil dihapus');
+            }
+        };
+        
+        console.log('✅ deleteProduct overridden!');
+    } else {
+        setTimeout(overrideDeleteProduct, 500);
     }
 };
+
+setTimeout(overrideDeleteProduct, 2000);
 
 // Override renderMyProducts to load from Firestore
 const originalRenderMyProducts = window.renderMyProducts;
