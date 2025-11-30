@@ -2729,7 +2729,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
         import { getDatabase } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -2750,6 +2750,17 @@
         window.db = getFirestore(app);
         window.rtdb = getDatabase(app);
         
+        // Export Firestore functions to window for use in inline scripts
+        window.firestoreCollection = collection;
+        window.firestoreAddDoc = addDoc;
+        window.firestoreGetDocs = getDocs;
+        window.firestoreDoc = doc;
+        window.firestoreDeleteDoc = deleteDoc;
+        window.firestoreUpdateDoc = updateDoc;
+        window.firestoreServerTimestamp = serverTimestamp;
+        window.firestoreQuery = query;
+        window.firestoreOrderBy = orderBy;
+        
         // Check authentication
         onAuthStateChanged(window.auth, (user) => {
             if (!user && !localStorage.getItem('isGuest')) {
@@ -2762,6 +2773,10 @@
     <!-- Firebase Chat Modules -->
     <script type="module" src="firebase-chat.js"></script>
     <script type="module" src="dashboard-chat-firebase.js"></script>
+    
+    <!-- Firebase Product Modules -->
+    <script src="product-firebase.js"></script>
+    <script src="dashboard-product-integration.js"></script>
 </head>
 <body>
     <!-- Header Section -->
